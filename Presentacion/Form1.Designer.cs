@@ -157,6 +157,11 @@ namespace Presentacion
 			// Num_Cantidad
 			// 
 			this.Num_Cantidad.Location = new System.Drawing.Point(97, 115);
+			this.Num_Cantidad.Maximum = new decimal(new int[] {
+            1000000000,
+            0,
+            0,
+            0});
 			this.Num_Cantidad.Name = "Num_Cantidad";
 			this.Num_Cantidad.Size = new System.Drawing.Size(283, 22);
 			this.Num_Cantidad.TabIndex = 12;

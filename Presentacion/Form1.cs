@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Entidades;
 using Negocio;
+using System.Text.RegularExpressions;
 
 namespace Presentacion
 {
@@ -215,6 +216,37 @@ namespace Presentacion
 
             return true;
         }
+        private bool ValidateNum_Cantidad()
+        {
+            if (string.IsNullOrWhiteSpace(Num_Cantidad.Text) || Num_Cantidad.Value == 0 || Num_Cantidad.Value > 999999)
+            {
+                Num_Cantidad.Focus();
+                return false;
+            }
+
+            return true;
+        }
+        private bool ValidateTB_Precio()
+        {
+            string precio = TB_Precio.Text.Trim();
+
+            // Verificar si el campo está en blanco o nulo
+            if (string.IsNullOrWhiteSpace(precio))
+            {
+                TB_Precio.Focus();
+                return false;
+            }
+
+            // Validar el formato del precio utilizando una expresión regular
+            Regex regex = new Regex(@"^\d{1,6}([.,]\d{1,2})?$");
+            if (!regex.IsMatch(precio))
+            {
+                TB_Precio.Focus();
+                return false;
+            }
+
+            return true;
+        }
 
         private void btnModificarProducto_Click(object sender, EventArgs e)
         {
@@ -225,6 +257,14 @@ namespace Presentacion
 				{
                     MessageBox.Show("No se puede modificar, se ingresó incorrectamente el siguente campo: Nombre");
 				}
+                else if (!ValidateNum_Cantidad())
+                {
+                    MessageBox.Show("No se puede modificar, se ingresó incorrectamente el siguiente campo: Cantidad");
+                }
+                else if(!ValidateTB_Precio())
+				{
+                    MessageBox.Show("No se puede modificar, se ingresó incorrectamente el siguiente campo: Precio");
+                }
                 else if (TB_NombreProducto.Text != "" && TB_Precio.Text != "" && CB_Categoria.SelectedIndex != -1 && Num_Cantidad.Value != 0)
                 {
                     MessageBox.Show(gp.ModificarProducto(codProducto, TB_NombreProducto.Text, Convert.ToDecimal(TB_Precio.Text), CB_Categoria.SelectedItem.ToString(), Convert.ToInt32(Num_Cantidad.Value)));
@@ -257,6 +297,7 @@ namespace Presentacion
                 CB_Categoria.SelectedIndex = -1;
                 Num_Cantidad.Value = 0;
                 cmbCodeProdVenta.Items.Clear();
+                codProducto = -1;
                 foreach (var item in gp.Productos2())
                 {
                     cmbCodeProdVenta.Items.Add(item);
@@ -628,6 +669,10 @@ namespace Presentacion
             }
             else if (Char.IsControl(e.KeyChar))
             {
+                e.Handled = false;
+            }
+            else if (Char.IsLetter(e.KeyChar))
+			{
                 e.Handled = false;
             }
             else
