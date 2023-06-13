@@ -24,6 +24,12 @@ namespace Presentacion
         int codVenta;
         int contD = 0;
         int contC = 0;
+
+        string codProdVenta;
+        string dniCliVenta;
+
+        bool cmbDNIVentaInWait = false;
+
         public Form1()
         {
             InitializeComponent();
@@ -124,7 +130,7 @@ namespace Presentacion
             {
                 MessageBox.Show("Ingrese solo números en el campo Celular");
             }
-            
+
 
             contD = 0;
             contC = 0;
@@ -132,10 +138,10 @@ namespace Presentacion
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            
+
             //contD = 10;
             //contC = 9;
-            
+
             if (dni != 0)
             {
                 if (txtDNI.Text != Convert.ToString(dni))
@@ -174,8 +180,8 @@ namespace Presentacion
                 MessageBox.Show("Debe seleccionar un empleo de la lista");
             }
 
-            
-            
+
+
             //contD = 0;
             //contC = 0;
         }
@@ -200,7 +206,7 @@ namespace Presentacion
             {
                 MessageBox.Show("Por favor complete todos los campos.");
             }
-            
+
         }
 
         private bool ValidateTB_NombreProducto()
@@ -250,19 +256,19 @@ namespace Presentacion
 
         private void btnModificarProducto_Click(object sender, EventArgs e)
         {
- 
+
             if (codProducto != -1)
             {
                 if (!ValidateTB_NombreProducto())
-				{
+                {
                     MessageBox.Show("No se puede modificar, se ingresó incorrectamente el siguente campo: Nombre");
-				}
+                }
                 else if (!ValidateNum_Cantidad())
                 {
                     MessageBox.Show("No se puede modificar, se ingresó incorrectamente el siguiente campo: Cantidad");
                 }
-                else if(!ValidateTB_Precio())
-				{
+                else if (!ValidateTB_Precio())
+                {
                     MessageBox.Show("No se puede modificar, se ingresó incorrectamente el siguiente campo: Precio");
                 }
                 else if (TB_NombreProducto.Text != "" && TB_Precio.Text != "" && CB_Categoria.SelectedIndex != -1 && Num_Cantidad.Value != 0)
@@ -333,6 +339,8 @@ namespace Presentacion
                 if (selec != -1)
                 {
                     codVenta = Convert.ToInt32(dataGridView3.Rows[selec].Cells[0].Value);
+                    codProdVenta= Convert.ToString(dataGridView3.Rows[selec].Cells[2].Value);
+                    dniCliVenta = Convert.ToString(dataGridView3.Rows[selec].Cells[1].Value);
                     cmbDNIVenta.Text = Convert.ToString(dataGridView3.Rows[selec].Cells[1].Value);
                     cmbCodeProdVenta.Text = Convert.ToString(dataGridView3.Rows[selec].Cells[2].Value);
                     Num_Cantidad_Venta.Value = Convert.ToInt32(dataGridView3.Rows[selec].Cells[3].Value);
@@ -344,70 +352,141 @@ namespace Presentacion
 
         private void btnAgregarVenta_Click(object sender, EventArgs e)
         {
-            if (cmbDNIVenta.SelectedIndex != -1 && cmbCodeProdVenta.SelectedIndex != -1 && Num_Cantidad_Venta.Value != -1 && DT_Fecha.Value != null)
+            /* VALIDACION DNI CLIENTE Y CODIDGO PRODUCTO */
+            bool dniExiste = false;
+            bool codProdExiste = false;
+
+            foreach (var item in cmbDNIVenta.Items)
             {
-                int cantidad = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString()));
-                int comprar = Convert.ToInt32(Num_Cantidad_Venta.Value);
-                if (comprar <= cantidad)
+                if (item is eCliente && ((eCliente)item).dni.ToString() == cmbDNIVenta.Text)
                 {
-                    nventa.AgregarVenta(Convert.ToInt32(cmbDNIVenta.SelectedItem.ToString().Trim()), Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString().Trim()), Convert.ToInt32(Num_Cantidad_Venta.Value), Convert.ToDecimal(lbl_Precio.Text), DT_Fecha.Value);
-                    MostrarVenta();
-                    int actual = cantidad - comprar;
-                    gp.ModificarCantidad(actual, Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString()));
-                    MostrarProductos();
-                    cmbDNIVenta.SelectedIndex = -1;
-                    cmbCodeProdVenta.SelectedIndex = -1;
-                    Num_Cantidad_Venta.Value = 0;
-                    lbl_Precio.Text = "";
-                    DT_Fecha.Value = DateTime.Now;
+                    dniExiste = true;
+                    break;
+                }
+            }
+
+            foreach (var item in cmbCodeProdVenta.Items)
+            {
+                if (item is eProducto && ((eProducto)item).CodigoProducto.ToString() == cmbCodeProdVenta.Text)
+                {
+                    codProdExiste = true;
+                    break;
+                }
+            }
+
+            if (cmbDNIVenta.Text.Length != 0 && cmbCodeProdVenta.Text.Length != 0 && Num_Cantidad_Venta.Text.Length != 0 && DT_Fecha.Value != null)
+            {
+                if (dniExiste)
+                {
+                    if (codProdExiste)
+                    {
+                        int cantidad = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.Text));
+                        int comprar = Convert.ToInt32(Num_Cantidad_Venta.Value);
+                        if (comprar <= cantidad)
+                        {
+                            nventa.AgregarVenta(Convert.ToInt32(cmbDNIVenta.Text.Trim()), Convert.ToInt32(cmbCodeProdVenta.Text.Trim()), Convert.ToInt32(Num_Cantidad_Venta.Value), Convert.ToDecimal(lbl_Precio.Text), DT_Fecha.Value);
+                            MostrarVenta();
+                            int actual = cantidad - comprar;
+                            gp.ModificarCantidad(actual, Convert.ToInt32(cmbCodeProdVenta.Text));
+                            MostrarProductos();
+                            cmbDNIVenta.SelectedIndex = -1;
+                            cmbCodeProdVenta.SelectedIndex = -1;
+                            Num_Cantidad_Venta.Value = 0;
+                            lbl_Precio.Text = "";
+                            DT_Fecha.Value = DateTime.Now;
+                        }
+                        else
+                        {
+                            MessageBox.Show("No contamos con esta cantidad en el inventario.");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Código de producto inválido.");
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("No contamos con esta cantidad en el inventario.");
+                    MessageBox.Show("DNI de cliente inválido.");
                 }
             }
             else
             {
                 MessageBox.Show("Rellene todos los campos");
             }
+
         }
 
         private void btnModificarVenta_Click(object sender, EventArgs e)
         {
-            if (codVenta != -1)
+            /* VALIDACION DNI CLIENTE Y CODIDGO PRODUCTO */
+            bool dniExiste = false;
+            bool codProdExiste = false;
+            foreach (var item in cmbDNIVenta.Items)
             {
-                int producto = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString()));
-                int cantidadRegistrada = nventa.Cantidad(codVenta);
-                int comprar = Convert.ToInt32(Num_Cantidad_Venta.Value);
-                if (comprar <= producto)
+                if (item is eCliente && ((eCliente)item).dni.ToString() == cmbDNIVenta.Text)
                 {
-                    producto += (cantidadRegistrada - comprar);
-                    MessageBox.Show(nventa.ModificarVenta(codVenta, Convert.ToInt32(cmbDNIVenta.Text.Trim()), Convert.ToInt32(cmbCodeProdVenta.Text.Trim()), Convert.ToInt32(Num_Cantidad_Venta.Value), Convert.ToDecimal(lbl_Precio.Text), DT_Fecha.Value));
-                    gp.ModificarCantidad(producto, Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString()));
-                    MostrarProductos();
-                    MostrarVenta();
+                    dniExiste = true;
+                    break;
                 }
-                cmbDNIVenta.SelectedIndex = -1;
-                cmbCodeProdVenta.SelectedIndex = -1;
-                Num_Cantidad_Venta.Value = 0;
-                lbl_Precio.Text = "0.00";
-                DT_Fecha.Value = DateTime.Now;
-            }
-            else
-            {
-                MessageBox.Show("Por favor seleccione una venta de la lista.");
             }
 
+            foreach (var item in cmbCodeProdVenta.Items)
+            {
+                if (item is eProducto && ((eProducto)item).CodigoProducto.ToString() == cmbCodeProdVenta.Text)
+                {
+                    codProdExiste = true;
+                    break;
+                }
+            }
+
+            if (codVenta != -1)
+                {
+                if (dniExiste)
+                {
+                    if (codProdExiste)
+                    {
+                    int producto = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.Text));
+          ;         int cantidadRegistrada = nventa.Cantidad(codVenta);
+                    int comprar = Convert.ToInt32(Num_Cantidad_Venta.Value);
+                    if (comprar <= producto)
+                    {
+                        producto += (cantidadRegistrada - comprar);
+                        MessageBox.Show(nventa.ModificarVenta(codVenta, Convert.ToInt32(cmbDNIVenta.Text.Trim()), Convert.ToInt32(cmbCodeProdVenta.Text.Trim()), Convert.ToInt32(Num_Cantidad_Venta.Value), Convert.ToDecimal(lbl_Precio.Text), DT_Fecha.Value));
+                        gp.ModificarCantidad(producto, Convert.ToInt32(cmbCodeProdVenta.Text));
+                        MostrarProductos();
+                        MostrarVenta();
+                    }
+                    cmbDNIVenta.SelectedIndex = -1;
+                    cmbCodeProdVenta.SelectedIndex = -1;
+                    Num_Cantidad_Venta.Value = 0;
+                    lbl_Precio.Text = "0.00";
+                    DT_Fecha.Value = DateTime.Now;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Código de producto inválido.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No modifique el DNI Cliente");
+                }
+            } 
+                else
+                {
+                    MessageBox.Show("Por favor seleccione una venta de la lista.");
+                }
         }
 
         private void btnEliminarVenta_Click(object sender, EventArgs e)
         {
             if (codVenta != -1)
             {
-                int producto = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString()));
+                int producto = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.Text));
                 int cantidadRegistrada = Convert.ToInt32(Num_Cantidad_Venta.Value);
                 producto += cantidadRegistrada;
-                gp.ModificarCantidad(producto, Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString()));
+                gp.ModificarCantidad(producto, Convert.ToInt32(cmbCodeProdVenta.Text));
                 MostrarProductos();
                 MessageBox.Show(nventa.EliminarVenta(codVenta));
                 MostrarVenta();
@@ -445,19 +524,19 @@ namespace Presentacion
                     foreach (var item in gp.Productos("Carne Cruda"))
                     {
                         CB_Producto.Items.Add(item);
-                    } 
+                    }
                     break;
-                case 1: 
+                case 1:
                     foreach (var item in gp.Productos("Carne Precocida"))
                     {
                         CB_Producto.Items.Add(item);
-                    } 
+                    }
                     break;
-                case 2: 
+                case 2:
                     foreach (var item in gp.Productos("Lacteos"))
                     {
                         CB_Producto.Items.Add(item);
-                    } 
+                    }
                     break;
             }
         }
@@ -476,7 +555,7 @@ namespace Presentacion
 
         private void Num_Cantidad_Venta_ValueChanged(object sender, EventArgs e)
         {
-            if(cmbCodeProdVenta.SelectedIndex != -1 && Num_Cantidad_Venta.Value != 0)
+            if (cmbCodeProdVenta.SelectedIndex != -1 && Num_Cantidad_Venta.Value != 0)
             {
                 Decimal precio = gp.Precio(Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString())) * Convert.ToDecimal(Num_Cantidad_Venta.Value);
                 lbl_Precio.Text = Convert.ToString(precio);
@@ -564,7 +643,7 @@ namespace Presentacion
             }
             else
             {
-                
+
                 e.Handled = true;
             }
         }
@@ -602,7 +681,8 @@ namespace Presentacion
                     e.Handled = false;
                     contC++;
                 }
-                else if(Char.IsDigit(e.KeyChar)){
+                else if (Char.IsDigit(e.KeyChar))
+                {
                     e.Handled = false;
                     contC++;
                 }
@@ -647,7 +727,7 @@ namespace Presentacion
             {
                 e.Handled = false;
             }
-            else if(Char.IsControl(e.KeyChar))
+            else if (Char.IsControl(e.KeyChar))
             {
                 e.Handled = false;
             }
@@ -659,7 +739,7 @@ namespace Presentacion
 
         private void TB_Precio_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if(Char.IsDigit(e.KeyChar))
+            if (Char.IsDigit(e.KeyChar))
             {
                 e.Handled = false;
             }
@@ -672,7 +752,7 @@ namespace Presentacion
                 e.Handled = false;
             }
             else if (Char.IsLetter(e.KeyChar))
-			{
+            {
                 e.Handled = false;
             }
             else
@@ -688,12 +768,37 @@ namespace Presentacion
 
         private void cmbDNIVenta_KeyPress(object sender, KeyPressEventArgs e)
         {
-            e.Handled = true;
+            if (!cmbDNIVentaInWait)
+            {
+                if (cmbDNIVenta.Text.Length < 8)
+                {
+
+                }
+                else if (cmbDNIVenta.Text.Length == 8)
+                {
+                    if (Char.IsControl(e.KeyChar))
+                    {
+                        e.Handled = false;
+                    }
+                    else
+                    {
+                        e.Handled = true;
+                    }
+                }
+            }
+            else if (Char.IsControl(e.KeyChar))
+            {
+                e.Handled = false;
+            }
+            else
+            {
+                e.Handled = true;
+            }
         }
 
         private void cmbCodeProdVenta_KeyPress(object sender, KeyPressEventArgs e)
         {
-            e.Handled = true;
+            e.Handled = false;
         }
 
         private void CB_Categoria1_KeyPress(object sender, KeyPressEventArgs e)
@@ -751,6 +856,6 @@ namespace Presentacion
             }
         }
 
-	}
-	
+    }
+
 }
