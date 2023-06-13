@@ -21,7 +21,7 @@ namespace Presentacion
         DataTable dt = new DataTable();
         int dni;
         int codProducto = -1;
-        int codVenta;
+        int codVenta = -1;
         int contD = 0;
         int contC = 0;
 
