@@ -148,6 +148,11 @@ namespace Presentacion
                 {
                     MessageBox.Show("No Modifique el campo DNI");
                 }
+                else if (txtNombre.Text.Length < 2 || txtNombre.Text.Length > 20)
+                {
+                    MessageBox.Show("Rellene todos los campos");
+                    return;
+                }
                 else
                 {
                     if (txtDireccion.Text.Length < 51)
