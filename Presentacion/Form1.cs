@@ -93,37 +93,43 @@ namespace Presentacion
         {
             if (!txtCelular.Text.Any(char.IsLetter)) //CP-019
             {
-                if (txtDireccion.Text.Length < 51)
-                {
-                    if (txtDNI.Text != "" && txtNombre.Text != "" && txtCelular.Text != "" && txtDireccion.Text != "")
+                if (!txtDNI.Text.Any(char.IsLetter)) {
+                    if (txtDireccion.Text.Length < 51)
                     {
-                        ncliente.InsertarCliente(Convert.ToInt32(txtDNI.Text.Trim()), txtNombre.Text.Trim(), Convert.ToInt32(txtCelular.Text.Trim()), txtDireccion.Text.Trim());
-                        txtDNI.Text = "";
-                        txtNombre.Text = "";
-                        txtCelular.Text = "";
-                        txtDireccion.Text = "";
-                        MostrarCliente();
-                        CB_Producto.Items.Clear();
-                        switch (CB_Categoria1.SelectedIndex)
+                        if (txtDNI.Text != "" && txtNombre.Text != "" && txtCelular.Text != "" && txtDireccion.Text != "")
                         {
-                            case 1: CB_Producto.Items.Add(gp.Productos("Carne Cruda")); break;
-                            case 2: CB_Producto.Items.Add(gp.Productos("Carne Precocida")); break;
-                            case 3: CB_Producto.Items.Add(gp.Productos("Lacteos")); break;
+                            ncliente.InsertarCliente(Convert.ToInt32(txtDNI.Text.Trim()), txtNombre.Text.Trim(), Convert.ToInt32(txtCelular.Text.Trim()), txtDireccion.Text.Trim());
+                            txtDNI.Text = "";
+                            txtNombre.Text = "";
+                            txtCelular.Text = "";
+                            txtDireccion.Text = "";
+                            MostrarCliente();
+                            CB_Producto.Items.Clear();
+                            switch (CB_Categoria1.SelectedIndex)
+                            {
+                                case 1: CB_Producto.Items.Add(gp.Productos("Carne Cruda")); break;
+                                case 2: CB_Producto.Items.Add(gp.Productos("Carne Precocida")); break;
+                                case 3: CB_Producto.Items.Add(gp.Productos("Lacteos")); break;
+                            }
+                            cmbDNIVenta.Items.Clear();
+                            foreach (var item in ncliente.Clientes())
+                            {
+                                cmbDNIVenta.Items.Add(item);
+                            }
                         }
-                        cmbDNIVenta.Items.Clear();
-                        foreach (var item in ncliente.Clientes())
+                        else
                         {
-                            cmbDNIVenta.Items.Add(item);
+                            MessageBox.Show("Rellene todos los campos");
                         }
                     }
                     else
                     {
-                        MessageBox.Show("Rellene todos los campos");
+                        MessageBox.Show("El Campo Dirección debe tener máximo 50 caracteres");
                     }
                 }
                 else
                 {
-                    MessageBox.Show("El Campo Dirección debe tener máximo 50 caracteres");
+                    MessageBox.Show("Ingrese solo números en el campo DNI");
                 }
             }
             else
@@ -631,6 +637,11 @@ namespace Presentacion
             if (contD < 8)
             {
                 if (Char.IsDigit(e.KeyChar))
+                {
+                    e.Handled = false;
+                    contD++;
+                }
+                else if (Char.IsLetter(e.KeyChar))
                 {
                     e.Handled = false;
                     contD++;
