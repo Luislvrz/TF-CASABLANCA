@@ -78,7 +78,7 @@ namespace Datos
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return "Este producto no se puede eliminar";
             }
             finally
             {
