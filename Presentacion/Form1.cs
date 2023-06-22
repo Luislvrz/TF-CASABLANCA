@@ -324,7 +324,9 @@ namespace Presentacion
                 {
                     codProducto = Convert.ToInt32(dataGridView2.Rows[selec].Cells[0].Value);
                     TB_NombreProducto.Text = Convert.ToString(dataGridView2.Rows[selec].Cells[1].Value);
-                    TB_Precio.Text = Convert.ToString(dataGridView2.Rows[selec].Cells[2].Value);
+                    //Formateo del precio
+                    decimal precio = Convert.ToDecimal(dataGridView2.Rows[selec].Cells[2].Value);
+                    TB_Precio.Text = precio.ToString("0.00");
                     CB_Categoria.SelectedItem = Convert.ToString(dataGridView2.Rows[selec].Cells[3].Value);
                     Num_Cantidad.Value = Convert.ToInt32(dataGridView2.Rows[selec].Cells[4].Value);
                 }
