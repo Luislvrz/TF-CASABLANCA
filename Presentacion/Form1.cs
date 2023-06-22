@@ -494,7 +494,7 @@ namespace Presentacion
                 MostrarVenta();
                 cmbDNIVenta.SelectedIndex = -1;
                 cmbCodeProdVenta.SelectedIndex = -1;
-                Num_Cantidad_Venta.Value = 0;
+                Num_Cantidad_Venta.Value = 1;
                 lbl_Precio.Text = "0.00";
                 DT_Fecha.Value = DateTime.Now;
             }
@@ -801,6 +801,7 @@ namespace Presentacion
         private void cmbCodeProdVenta_KeyPress(object sender, KeyPressEventArgs e)
         {
             e.Handled = false;
+
         }
 
         private void CB_Categoria1_KeyPress(object sender, KeyPressEventArgs e)
@@ -825,7 +826,12 @@ namespace Presentacion
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
+                e.Handled = true;
                 MessageBox.Show("Por favor, ingrese sólo números");
+            }
+            else
+            {
+                e.Handled= false;
             }
         }
 
@@ -861,6 +867,66 @@ namespace Presentacion
             }
         }
 
+        private void cmbCodeProdVenta_KeyUp(object sender, KeyEventArgs e)
+        {
+            bool codeExite = false;
+
+            foreach (eProducto  item in cmbCodeProdVenta.Items)
+            {
+                if (item is eProducto && ((eProducto)item).CodigoProducto.ToString() == cmbCodeProdVenta.Text)
+                {
+                    codeExite = true;
+                    cmbCodeProdVenta.SelectedItem = item;
+                    cmbCodeProdVenta.Select(cmbCodeProdVenta.Text.Length, 0); //Mueve el cursor de vuelta al final
+                    break;
+                }
+            }
+
+            if (codeExite)
+            {
+                if (Num_Cantidad_Venta.Value != 0 && cmbCodeProdVenta.SelectedIndex != -1)
+                {
+                    Decimal precio = gp.Precio(Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString())) * Convert.ToDecimal(Num_Cantidad_Venta.Value);
+                    lbl_Precio.Text = Convert.ToString(precio);
+                }
+            }
+            else
+            {
+                lbl_Precio.Text = "Producto no encontrado";
+            }
+        }
+
+        private void Num_Cantidad_Venta_KeyUp(object sender, KeyEventArgs e)
+        {
+
+            if (e.Handled == false)
+            {
+                if (Num_Cantidad_Venta.Text == "")
+                {
+                    Num_Cantidad_Venta.Text = "1";
+                    Num_Cantidad_Venta.Value = 1;
+                     Num_Cantidad_Venta.Select(Num_Cantidad_Venta.Text.Length, 0); //Mueve el cursor de vuelta al final
+                }
+                if (Num_Cantidad_Venta.Value > 100)
+                {
+                    Num_Cantidad_Venta.Value = 100;
+                    Num_Cantidad_Venta.Select(Num_Cantidad_Venta.Text.Length, 0); //Mueve el cursor de vuelta al final
+                    MessageBox.Show("Máximo 100 unidades por compra.");
+                }
+                if (Num_Cantidad_Venta.Value > 100)
+                {
+                    Num_Cantidad_Venta.Value = 100;
+                    MessageBox.Show("Máximo 100 unidades por compra.");
+                }
+
+
+                if (Num_Cantidad_Venta.Value != 0 && cmbCodeProdVenta.SelectedIndex != -1)
+                {
+                    Decimal precio = gp.Precio(Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString())) * Convert.ToDecimal(Num_Cantidad_Venta.Value);
+                    lbl_Precio.Text = Convert.ToString(precio);
+                }
+            }
+        }
     }
 
 }
