@@ -918,25 +918,6 @@ namespace Presentacion
 
             if (e.Handled == false)
             {
-                if (Num_Cantidad_Venta.Text == "")
-                {
-                    Num_Cantidad_Venta.Text = "1";
-                    Num_Cantidad_Venta.Value = 1;
-                     Num_Cantidad_Venta.Select(Num_Cantidad_Venta.Text.Length, 0); //Mueve el cursor de vuelta al final
-                }
-                if (Num_Cantidad_Venta.Value > 100)
-                {
-                    Num_Cantidad_Venta.Value = 100;
-                    Num_Cantidad_Venta.Select(Num_Cantidad_Venta.Text.Length, 0); //Mueve el cursor de vuelta al final
-                    MessageBox.Show("Máximo 100 unidades por compra.");
-                }
-                if (Num_Cantidad_Venta.Value > 100)
-                {
-                    Num_Cantidad_Venta.Value = 100;
-                    MessageBox.Show("Máximo 100 unidades por compra.");
-                }
-
-
                 if (Num_Cantidad_Venta.Value != 0 && cmbCodeProdVenta.SelectedIndex != -1)
                 {
                     Decimal precio = gp.Precio(Convert.ToInt32(cmbCodeProdVenta.SelectedItem.ToString())) * Convert.ToDecimal(Num_Cantidad_Venta.Value);
