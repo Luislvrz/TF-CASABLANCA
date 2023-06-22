@@ -376,45 +376,52 @@ namespace Presentacion
                 }
             }
 
-            if (cmbDNIVenta.Text.Length != 0 && cmbCodeProdVenta.Text.Length != 0 && Num_Cantidad_Venta.Text.Length != 0 && DT_Fecha.Value != null)
+            if (!(DT_Fecha.Value.CompareTo(DateTime.Now) > 0))
             {
-                if (dniExiste)
+                if (cmbDNIVenta.Text.Length != 0 && cmbCodeProdVenta.Text.Length != 0 && Num_Cantidad_Venta.Text.Length != 0 && DT_Fecha.Value != null)
                 {
-                    if (codProdExiste)
+                    if (dniExiste)
                     {
-                        int cantidad = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.Text));
-                        int comprar = Convert.ToInt32(Num_Cantidad_Venta.Value);
-                        if (comprar <= cantidad)
+                        if (codProdExiste)
                         {
-                            nventa.AgregarVenta(Convert.ToInt32(cmbDNIVenta.Text.Trim()), Convert.ToInt32(cmbCodeProdVenta.Text.Trim()), Convert.ToInt32(Num_Cantidad_Venta.Value), Convert.ToDecimal(lbl_Precio.Text), DT_Fecha.Value);
-                            MostrarVenta();
-                            int actual = cantidad - comprar;
-                            gp.ModificarCantidad(actual, Convert.ToInt32(cmbCodeProdVenta.Text));
-                            MostrarProductos();
-                            cmbDNIVenta.SelectedIndex = -1;
-                            cmbCodeProdVenta.SelectedIndex = -1;
-                            Num_Cantidad_Venta.Value = 1;
-                            lbl_Precio.Text = "";
-                            DT_Fecha.Value = DateTime.Now;
+                            int cantidad = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.Text));
+                            int comprar = Convert.ToInt32(Num_Cantidad_Venta.Value);
+                            if (comprar <= cantidad)
+                            {
+                                nventa.AgregarVenta(Convert.ToInt32(cmbDNIVenta.Text.Trim()), Convert.ToInt32(cmbCodeProdVenta.Text.Trim()), Convert.ToInt32(Num_Cantidad_Venta.Value), Convert.ToDecimal(lbl_Precio.Text), DT_Fecha.Value);
+                                MostrarVenta();
+                                int actual = cantidad - comprar;
+                                gp.ModificarCantidad(actual, Convert.ToInt32(cmbCodeProdVenta.Text));
+                                MostrarProductos();
+                                cmbDNIVenta.SelectedIndex = -1;
+                                cmbCodeProdVenta.SelectedIndex = -1;
+                                Num_Cantidad_Venta.Value = 1;
+                                lbl_Precio.Text = "";
+                                DT_Fecha.Value = DateTime.Now;
+                            }
+                            else
+                            {
+                                MessageBox.Show("No contamos con esta cantidad en el inventario.");
+                            }
                         }
                         else
                         {
-                            MessageBox.Show("No contamos con esta cantidad en el inventario.");
+                            MessageBox.Show("Código de producto inválido.");
                         }
                     }
                     else
                     {
-                        MessageBox.Show("Código de producto inválido.");
+                        MessageBox.Show("DNI de cliente inválido.");
                     }
                 }
                 else
                 {
-                    MessageBox.Show("DNI de cliente inválido.");
+                    MessageBox.Show("Rellene todos los campos");
                 }
             }
             else
             {
-                MessageBox.Show("Rellene todos los campos");
+                MessageBox.Show("Fecha inválida, seleccione otra fecha");
             }
 
         }
@@ -442,47 +449,57 @@ namespace Presentacion
                 }
             }
 
-            if (codVenta != -1)
+            if (!(DT_Fecha.Value.CompareTo(DateTime.Now) > 0))
+            {
+                if (codVenta != -1)
                 {
-                if (dniExiste)
-                {
-                    if (codProdExiste)
+                    if (dniExiste)
                     {
-                    int producto = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.Text));
-          ;         int cantidadRegistrada = nventa.Cantidad(codVenta);
-                    int comprar = Convert.ToInt32(Num_Cantidad_Venta.Value);
-                    if (comprar <= producto)
-                    {
-                        producto += (cantidadRegistrada - comprar);
-                        MessageBox.Show(nventa.ModificarVenta(codVenta, Convert.ToInt32(cmbDNIVenta.Text.Trim()), Convert.ToInt32(cmbCodeProdVenta.Text.Trim()), Convert.ToInt32(Num_Cantidad_Venta.Value), Convert.ToDecimal(lbl_Precio.Text), DT_Fecha.Value));
-                        gp.ModificarCantidad(producto, Convert.ToInt32(cmbCodeProdVenta.Text));
-                        MostrarProductos();
-                        MostrarVenta();
-                    }
-                    cmbDNIVenta.SelectedIndex = -1;
-                    cmbCodeProdVenta.SelectedIndex = -1;
-                    Num_Cantidad_Venta.Value = 0;
-                    lbl_Precio.Text = "0.00";
-                    DT_Fecha.Value = DateTime.Now;
+                        if (codProdExiste)
+                        {
+                            int producto = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.Text));
+                            ; int cantidadRegistrada = nventa.Cantidad(codVenta);
+                            int comprar = Convert.ToInt32(Num_Cantidad_Venta.Value);
+                            if (comprar <= producto)
+                            {
+                                producto += (cantidadRegistrada - comprar);
+                                MessageBox.Show(nventa.ModificarVenta(codVenta, Convert.ToInt32(cmbDNIVenta.Text.Trim()), Convert.ToInt32(cmbCodeProdVenta.Text.Trim()), Convert.ToInt32(Num_Cantidad_Venta.Value), Convert.ToDecimal(lbl_Precio.Text), DT_Fecha.Value));
+                                gp.ModificarCantidad(producto, Convert.ToInt32(cmbCodeProdVenta.Text));
+                                MostrarProductos();
+                                MostrarVenta();
+                            }
+                            cmbDNIVenta.SelectedIndex = -1;
+                            cmbCodeProdVenta.SelectedIndex = -1;
+                            Num_Cantidad_Venta.Value = 1;
+                            lbl_Precio.Text = "0.00";
+                            DT_Fecha.Value = DateTime.Now;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Código de producto inválido.");
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("Código de producto inválido.");
+                        MessageBox.Show("No modifique el DNI Cliente");
                     }
                 }
-                else
-                {
-                    MessageBox.Show("No modifique el DNI Cliente");
-                }
-            } 
                 else
                 {
                     MessageBox.Show("Por favor seleccione una venta de la lista.");
                 }
+            }
+            else
+            {
+                MessageBox.Show("Fecha inválida, seleccione otra fecha");
+            }
+
+            
         }
 
         private void btnEliminarVenta_Click(object sender, EventArgs e)
         {
+            
             if (codVenta != -1)
             {
                 int producto = gp.Cantidad(Convert.ToInt32(cmbCodeProdVenta.Text));
