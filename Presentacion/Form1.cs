@@ -213,7 +213,7 @@ namespace Presentacion
         {
             string text = TB_NombreProducto.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(text) || text.Length > 20 || !text.All(char.IsLetter))
+            if (string.IsNullOrWhiteSpace(text) || text.Length > 20 || text.Length < 2 || !text.All(char.IsLetter))
             {
                 TB_NombreProducto.Focus();
                 TB_NombreProducto.SelectAll();
