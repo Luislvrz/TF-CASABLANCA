@@ -393,7 +393,7 @@ namespace Presentacion
                             MostrarProductos();
                             cmbDNIVenta.SelectedIndex = -1;
                             cmbCodeProdVenta.SelectedIndex = -1;
-                            Num_Cantidad_Venta.Value = 0;
+                            Num_Cantidad_Venta.Value = 1;
                             lbl_Precio.Text = "";
                             DT_Fecha.Value = DateTime.Now;
                         }
@@ -823,7 +823,10 @@ namespace Presentacion
 
         private void Num_Cantidad_Venta_KeyPress(object sender, KeyPressEventArgs e)
         {
-            e.Handled = true;
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                MessageBox.Show("Por favor, ingrese sólo números");
+            }
         }
 
         private void Num_Mes_KeyPress(object sender, KeyPressEventArgs e)
